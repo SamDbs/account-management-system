@@ -17,17 +17,6 @@ class ProfileController extends Controller
     /**
      * Display the user's profile form.
      */
-    public function show(Request $request): Response
-    {
-        dump($request->user());
-        return Inertia::render('Profile/UserProfile', [
-            'user' => $request->user()
-        ]);
-    }
-
-    /**
-     * Display the user's profile form.
-     */
     public function edit(User $user): Response
     {
         return Inertia::render('Profile/Edit', [
