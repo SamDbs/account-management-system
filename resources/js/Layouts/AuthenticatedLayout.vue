@@ -11,7 +11,7 @@
                                 <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
                                     Dashboard
                                 </NavLink>
-                                <NavLink :href="route('profile.edit')" :active="route().current('profile')">
+                                <NavLink :href="userEditRoute" :active="route().current('profile')">
                                     Profile
                                 </NavLink>
                             </div>
@@ -96,7 +96,7 @@
                         <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
                             Dashboard
                         </ResponsiveNavLink>
-                        <ResponsiveNavLink :href="route('profile.edit')" :active="route().current('profile')">
+                        <ResponsiveNavLink :href="userEditRoute" :active="route().current('profile')">
                             Profile
                         </ResponsiveNavLink>
                     </div>
@@ -139,6 +139,11 @@ import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
 import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
+import {usePage} from "@inertiajs/vue3";
 
 const showingNavigationDropdown = ref(false);
+
+const user = usePage().props.auth.user;
+
+const userEditRoute = route('user.edit', [user.id]);
 </script>

@@ -8,7 +8,7 @@
             </p>
         </header>
 
-        <form @submit.prevent="form.patch(route('profile.update'))" class="mt-6 space-y-6">
+        <form @submit.prevent="form.patch(route('user.update'))" class="mt-6 space-y-6">
             <div>
                 <InputLabel for="name" value="Name" />
 
@@ -113,14 +113,13 @@ import { Link, useForm, usePage } from '@inertiajs/vue3';
 const props = defineProps({
     mustVerifyEmail: Boolean,
     status: String,
+    user: Object
 });
-
-const user = usePage().props.auth.user;
-
+console.log(props.user)
 const form = useForm({
-    name: user.name,
-    email: user.email,
-    phone: user.phone,
-    description: user.description,
+    name: props.user.name,
+    email: props.user.email,
+    phone: props.user.phone,
+    description: props.user.description,
 });
 </script>

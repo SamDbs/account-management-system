@@ -14,11 +14,27 @@
                 </div>
             </div>
         </AuthenticatedLayout>
-
+        <UsersIndex
+            v-for="(user, i) in users"
+            :key="i"
+            :user="user"
+        />
     </div>
 </template>
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import UsersIndex from '@/Pages/Resources/UsersIndex.vue';
 
-import {Head} from '@inertiajs/vue3';
+import { Head } from '@inertiajs/vue3';
+
+const props = defineProps({
+    users: {
+        type: Object,
+        default: () => ({}),
+    },
+    status: {
+        type: String,
+        default: '',
+    }
+});
 </script>

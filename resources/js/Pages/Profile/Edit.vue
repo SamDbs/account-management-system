@@ -12,6 +12,7 @@
                     <UpdateProfileInformationForm
                         :must-verify-email="mustVerifyEmail"
                         :status="status"
+                        :user="user"
                         class="max-w-xl"
                     />
                 </div>
@@ -37,5 +38,6 @@ import { Head } from '@inertiajs/vue3';
 defineProps({
     mustVerifyEmail: Boolean,
     status: String,
+    user: Object
 });
 </script>

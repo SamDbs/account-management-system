@@ -8,6 +8,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -15,14 +16,40 @@ use Inertia\Response;
 class UserController extends Controller
 {
     /**
+     * Display all users
+     *
+     * @param Request $request
+     * @return Response
+     */
+    public function index(Request $request): Response
+    {
+        $response = Gate::inspect('viewAny', auth()->user());
+        if ($response->allowed()) {
+            $users = User::all();
+
+            return Inertia::render('Dashboard', [
+                'users' => $users,
+                'status' => session('status'),
+            ]);
+        }
+        return Inertia::render('Dashboard');
+    }
+
+    /**
      * Display the user's form.
      */
     public function edit(User $user): Response
     {
-        return Inertia::render('Profile/Edit', [
-            'mustVerifyEmail' => $user instanceof MustVerifyEmail,
-            'status' => session('status'),
-        ]);
+        $response = Gate::inspect('edit', $user);
+
+        if ($response->allowed()) {
+            return Inertia::render('Profile/Edit', [
+                'user' => $user,
+                'mustVerifyEmail' => $user instanceof MustVerifyEmail,
+                'status' => session('status'),
+            ]);
+        }
+        abort('403');
     }
 
     /**
@@ -38,27 +65,33 @@ class UserController extends Controller
 
         $request->user()->save();
 
-        return Redirect::route('profile.edit');
+        return redirect()->route('user.edit', ['id' => $request->user()->id]);;
     }
 
     /**
      * Delete the user's account.
      */
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(Request $request, User $user): RedirectResponse
     {
-        $request->validate([
-            'password' => ['required', 'current-password'],
-        ]);
+        $response = Gate::inspect('destroy', $user);
+        dump($response->allowed());
+        if ($response->allowed()) {
 
-        $user = $request->user();
+            $request->validate([
+                'password' => ['required', 'current-password'],
+            ]);
 
-        Auth::logout();
+            $user = $request->user();
 
-        $user->delete();
+            Auth::logout();
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+            $user->delete();
 
-        return Redirect::to('/');
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return Redirect::to('/');
+        }
+        abort('403');
     }
 }
