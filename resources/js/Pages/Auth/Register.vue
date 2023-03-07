@@ -1,31 +1,33 @@
-<script setup>
-import GuestLayout from '@/Layouts/GuestLayout.vue';
-import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
-import { Head, Link, useForm } from '@inertiajs/vue3';
-
-const form = useForm({
-    name: '',
-    email: '',
-    password: '',
-    password_confirmation: '',
-    terms: false,
-});
-
-const submit = () => {
-    form.post(route('register'), {
-        onFinish: () => form.reset('password', 'password_confirmation'),
-    });
-};
-</script>
-
 <template>
+    <div v-if="canLogin" class="sm:fixed sm:top-0 sm:right-0 p-6 text-right">
+        <Link
+            v-if="$page.props.auth.user"
+            :href="route('dashboard')"
+            class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
+        >Dashboard</Link
+        >
+
+        <template v-else>
+            <Link
+                :href="route('login')"
+                class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
+            >
+                Log in
+            </Link>
+
+            <Link
+                v-if="canRegister"
+                :href="route('register')"
+                class="ml-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500"
+            >Register</Link
+            >
+        </template>
+    </div>
     <GuestLayout>
         <Head title="Register" />
 
         <form @submit.prevent="submit">
+            <!-- Name field -->
             <div>
                 <InputLabel for="name" value="Name" />
 
@@ -42,6 +44,7 @@ const submit = () => {
                 <InputError class="mt-2" :message="form.errors.name" />
             </div>
 
+            <!-- Email field -->
             <div class="mt-4">
                 <InputLabel for="email" value="Email" />
 
@@ -57,6 +60,7 @@ const submit = () => {
                 <InputError class="mt-2" :message="form.errors.email" />
             </div>
 
+            <!-- Password field -->
             <div class="mt-4">
                 <InputLabel for="password" value="Password" />
 
@@ -72,6 +76,7 @@ const submit = () => {
                 <InputError class="mt-2" :message="form.errors.password" />
             </div>
 
+            <!-- Password confirmation field -->
             <div class="mt-4">
                 <InputLabel for="password_confirmation" value="Confirm Password" />
 
@@ -87,14 +92,23 @@ const submit = () => {
                 <InputError class="mt-2" :message="form.errors.password_confirmation" />
             </div>
 
-            <div class="flex items-center justify-end mt-4">
-                <Link
-                    :href="route('login')"
-                    class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
-                    Already registered?
-                </Link>
+            <!-- Phone field -->
+            <div>
+                <InputLabel for="phone" value="Phone" />
 
+                <TextInput
+                    id="phone"
+                    type="text"
+                    class="mt-1 block w-full"
+                    v-model="form.phone"
+                    required
+                    autofocus
+                    autocomplete="phone"
+                />
+
+                <InputError class="mt-2" :message="form.errors.phone" />
+            </div>
+            <div class="flex items-center justify-end mt-4">
                 <PrimaryButton class="ml-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
                     Register
                 </PrimaryButton>
@@ -102,3 +116,33 @@ const submit = () => {
         </form>
     </GuestLayout>
 </template>
+<script setup>
+import GuestLayout from '@/Layouts/GuestLayout.vue';
+import InputError from '@/Components/InputError.vue';
+import InputLabel from '@/Components/InputLabel.vue';
+import PrimaryButton from '@/Components/PrimaryButton.vue';
+import TextInput from '@/Components/TextInput.vue';
+import { Head, Link, useForm } from '@inertiajs/vue3';
+
+defineProps({
+    canLogin: Boolean,
+    canRegister: Boolean,
+    laravelVersion: String,
+    phpVersion: String,
+});
+
+const form = useForm({
+    name: '',
+    email: '',
+    password: '',
+    phone: '',
+    password_confirmation: '',
+    terms: false,
+});
+
+const submit = () => {
+    form.post(route('register'), {
+        onFinish: () => form.reset('password', 'password_confirmation'),
+    });
+};
+</script>
