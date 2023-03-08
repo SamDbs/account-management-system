@@ -16,10 +16,12 @@ class UserRequest extends FormRequest
      */
     public function rules(): array
     {
+        $user = $this->route('user');
+        $rule = $user ? Rule::unique(User::class)->ignore($user->id) : '';
         return [
             'name' => ['string', 'max:255', 'required'],
-            'email' => ['required','string','email', 'max:255', Rule::unique(User::class)->ignore($this->user()->id)],
-            'phone' => ['digits:10', Rule::unique(User::class)->ignore($this->user()->id)],
+            'email' => ['required','string','email', 'max:255', $rule],
+            'phone' => ['digits:10', $rule],
             'description' => ['string', 'max:255', 'nullable'],
             'password' => ['confirmed', Password::min(8)->mixedCase()->numbers()],
         ];

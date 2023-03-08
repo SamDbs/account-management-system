@@ -66,13 +66,13 @@ class UserController extends Controller
      * @throws ValidationException
      * @return RedirectResponse
      */
-    public function store(UserRequest $userRequest): RedirectResponse
+    public function store(UserRequest $userRequest, User $user): RedirectResponse
     {
         $response = Gate::inspect('store', auth()->user());
 
         if ($response->allowed()) {
             $validatedData = $userRequest->validated();
-            dump($validatedData);
+
             $userRole = Role::where('name', 'user')->first();
 
             $user = User::create([
@@ -121,17 +121,17 @@ class UserController extends Controller
      *
      * @return RedirectResponse
      */
-    public function update(UserRequest $request): RedirectResponse
+    public function update(UserRequest $request, User $user): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user->fill($request->validated());
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
         }
 
-        $request->user()->save();
+        $user->save();
 
-        return redirect()->route('user.edit', ['user' => $request->user()]);
+        return redirect()->route('user.edit', ['user' => $user]);
     }
 
     /**
