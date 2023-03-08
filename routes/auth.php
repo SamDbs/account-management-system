@@ -61,7 +61,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/user/{user}', [UserController::class, 'edit'])->name('user.edit');
     Route::patch('/user/{user}', [UserController::class, 'update'])->name('user.update');
-    Route::delete('/user/{user}', [UserController::class, 'destroy'])->name('user.destroy');
+    Route::delete('/user/{user}/delete', [UserController::class, 'delete'])->name('user.delete');
+    Route::delete('/user/{user}/destroy', [UserController::class, 'destroy'])->name('user.destroy');
 });
 
 Route::get('/dashboard', [UserController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
