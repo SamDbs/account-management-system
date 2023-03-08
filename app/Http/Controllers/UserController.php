@@ -131,7 +131,7 @@ class UserController extends Controller
 
         $request->user()->save();
 
-        return redirect()->route('user.edit', ['id' => $request->user()->id]);
+        return redirect()->route('user.edit', ['user' => $request->user()]);
     }
 
     /**
