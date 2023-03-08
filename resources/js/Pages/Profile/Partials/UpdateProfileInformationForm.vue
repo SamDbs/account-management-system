@@ -108,14 +108,14 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import TextArea from '@/Components/TextArea.vue';
 
-import { Link, useForm, usePage } from '@inertiajs/vue3';
+import { Link, useForm } from '@inertiajs/vue3';
 
 const props = defineProps({
     mustVerifyEmail: Boolean,
     status: String,
     user: Object
 });
-console.log(props.user)
+
 const form = useForm({
     name: props.user.name,
     email: props.user.email,
