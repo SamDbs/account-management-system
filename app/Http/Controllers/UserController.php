@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UserRequest;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
@@ -41,10 +42,13 @@ class UserController extends Controller
     public function edit(User $user): Response
     {
         $response = Gate::inspect('edit', $user);
+        $roleAdmin = Role::where('name', 'admin')->first();
 
+        $authAdmin = auth()->user()->role_id === $roleAdmin->id;
         if ($response->allowed()) {
             return Inertia::render('Profile/Edit', [
                 'user' => $user,
+                'authIsAdmin' => $authAdmin,
                 'mustVerifyEmail' => $user instanceof MustVerifyEmail,
                 'status' => session('status'),
             ]);
@@ -74,14 +78,20 @@ class UserController extends Controller
     public function destroy(Request $request, User $user): RedirectResponse
     {
         $response = Gate::inspect('destroy', $user);
-        dump($response->allowed());
+
+        // If user is admin or owner of profile
         if ($response->allowed()) {
+
+            // If user is admin and try to delete user, we don't want to verify password
+            if ($user->id !== auth()->id()) {
+                $user->delete();
+
+                return Redirect::to('/dashboard');
+            }
 
             $request->validate([
                 'password' => ['required', 'current-password'],
             ]);
-
-            $user = $request->user();
 
             Auth::logout();
 
