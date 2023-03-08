@@ -59,6 +59,8 @@ Route::middleware('auth')->group(function () {
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
                 ->name('logout');
 
+    Route::get('/user/create', [UserController::class, 'create'])->name('user.create');
+    Route::post('/user', [UserController::class, 'store'])->name('user.store');
     Route::get('/user/{user}', [UserController::class, 'edit'])->name('user.edit');
     Route::patch('/user/{user}', [UserController::class, 'update'])->name('user.update');
     Route::delete('/user/{user}/delete', [UserController::class, 'delete'])->name('user.delete');

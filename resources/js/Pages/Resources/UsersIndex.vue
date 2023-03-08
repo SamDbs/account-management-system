@@ -1,25 +1,58 @@
 <template>
-    <div class="flex">
-        {{ user.id }}
-        {{ user.name }}
-        {{ user.email }}
-        {{ user.description }}
-        {{ user.phone }}
-        <NavLink :href="route('user.edit', [user.id])" method="get" as="button" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
-            Edit
-        </NavLink>
-        <DangerButton
-            class=""
-            @click="confirmUserDeletion('delete')"
-        >
-            Delete Account
-        </DangerButton>
-        <DangerButton
-            class=""
-            @click="confirmUserDeletion('destroy')"
-        >
-            Destroy Account
-        </DangerButton>
+    <div class="m-10">
+        <table class="w-full w-fulltext-sm text-left text-gray-500">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                <tr class="text-center">
+                    <th scope="col" class="w-30 text-center p-3">
+                        Id
+                    </th>
+                    <th scope="col" class="w-30 text-center">
+                        Name
+                    </th>
+                    <th scope="col" class="w-30 text-center">
+                        Email
+                    </th>
+                    <th scope="col" class="w-20 text-center">
+                        Description
+                    </th>
+                    <th scope="col" class="w-30 text-center">
+                        Phone
+                    </th>
+                    <th scope="col" class="w-30 text-center">
+                        Deleted
+                    </th>
+                    <th scope="col" class="w-30 text-center">
+                        Actions
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="bg-white border-b text-center">
+                    <td class="py-4"> {{ user.id }} </td>
+                    <td class="py-4"> {{ user.name }} </td>
+                    <td class="py-4"> {{ user.email }} </td>
+                    <td class="py-4 break-words"> {{ user.description ?? 'No description' }} </td>
+                    <td class="py-4"> {{ user.phone }} </td>
+                    <td class="py-4"> {{ user.deleted_at }} </td>
+                    <td class="py-4 flex justify-center">
+                        <!-- Edit link -->
+                        <NavLink :href="route('user.edit', [user.id])" method="get" as="button" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                            Edit
+                        </NavLink>
+
+                        <!-- Delete modal -->
+                        <DangerButton @click="confirmUserDeletion('delete')">
+                            Delete Account
+                        </DangerButton>
+
+                        <!-- Destroy modal -->
+                        <DangerButton @click="confirmUserDeletion('destroy')">
+                            Destroy Account
+                        </DangerButton>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
     <Modal :show="confirmingUserDeletion" @close="closeModal">
         <div class="p-6">
@@ -35,7 +68,7 @@
                 <SecondaryButton @click="closeModal"> Cancel </SecondaryButton>
 
                 <NavLink :href="actionValue" method="delete" as="button" class="ml-3 inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-500 active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                    Delete Account
+                    Confirm
                 </NavLink>
             </div>
         </div>

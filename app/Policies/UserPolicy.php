@@ -2,25 +2,16 @@
 
 namespace App\Policies;
 
-use App\Models\Role;
 use App\Models\User;
 
 class UserPolicy
 {
     /**
-     * @var Role
-     */
-    protected Role $adminRole;
-    public function __construct( )
-    {
-        $this->adminRole = Role::where('name', 'admin')->first();
-    }
-    /**
      * Determine if user can view any models.
      */
     public function viewAny(User $user): bool
     {
-        return $user->role_id === $this->adminRole->id;
+        return $user->role->name === 'admin';
     }
 
     /**
@@ -28,15 +19,23 @@ class UserPolicy
      */
     public function view(User $user): bool
     {
-        return $user->role_id === $this->adminRole->id || $user->id === auth()->id();
+        return $user->role->name === 'admin' || $user->id === auth()->id();
     }
 
     /**
      * Determine if user can create the model.
      */
-    public function create(User $user): bool
+    public function create(): bool
     {
-        return $user->role_id === $this->adminRole->id;
+        return auth()->user()->role->name === 'admin';
+    }
+
+    /**
+     * Determine if user can create the model.
+     */
+    public function store(): bool
+    {
+        return auth()->user()->role->name === 'admin';
     }
 
     /**
@@ -44,7 +43,7 @@ class UserPolicy
      */
     public function edit(User $user,User $profileUser): bool
     {
-        return $user->role_id === $this->adminRole->id || $user->id === $profileUser->id;
+        return $user->role->name === 'admin' || $user->id === $profileUser->id;
     }
 
     /**
@@ -52,7 +51,7 @@ class UserPolicy
      */
     public function update(User $user, User $profileUser): bool
     {
-        return $user->role_id === $this->adminRole->id || $user->id === $profileUser->id;
+        return $user->role->name === 'admin' || $user->id === $profileUser->id;
     }
 
     /**
@@ -60,6 +59,6 @@ class UserPolicy
      */
     public function destroy(User $user, User $profileUser): bool
     {
-        return $user->role_id === $this->adminRole->id || $user->id === $profileUser->id;
+        return $user->role->name === 'admin' || $user->id === $profileUser->id;
     }
 }

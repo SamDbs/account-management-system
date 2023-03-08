@@ -5,12 +5,15 @@ namespace App\Http\Controllers;
 use App\Http\Requests\UserRequest;
 use App\Models\Role;
 use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
 
@@ -24,15 +27,68 @@ class UserController extends Controller
     public function index(): InertiaResponse
     {
         $response = Gate::inspect('viewAny', auth()->user());
+        $authIsAdmin = auth()->user()->role->name === 'admin';
         if ($response->allowed()) {
-            $users = User::all();
+            $users = User::withTrashed()->get();
 
             return Inertia::render('Dashboard', [
                 'users' => $users,
                 'status' => session('status'),
+                'authIsAdmin' => $authIsAdmin,
             ]);
         }
-        return Inertia::render('Dashboard');
+
+        return Inertia::render('Dashboard', [
+            'authIsAdmin' => $authIsAdmin,
+        ]);
+    }
+
+    /**
+     * Create form user
+     *
+     * @return InertiaResponse
+     */
+    public function create(): InertiaResponse
+    {
+        $response = Gate::inspect('create', auth()->user());
+
+        if ($response->allowed()) {
+            return Inertia::render('Auth/Form/NewUser');
+        }
+        abort('403');
+    }
+
+    /**
+     * Store new user
+     *
+     * @param UserRequest $userRequest
+     *
+     * @throws ValidationException
+     * @return RedirectResponse
+     */
+    public function store(UserRequest $userRequest): RedirectResponse
+    {
+        $response = Gate::inspect('store', auth()->user());
+
+        if ($response->allowed()) {
+            $validatedData = $userRequest->validated();
+            dump($validatedData);
+            $userRole = Role::where('name', 'user')->first();
+
+            $user = User::create([
+                'name' => $validatedData['name'],
+                'email' => $validatedData['email'],
+                'phone' => $validatedData['phone'],
+                'description' => $validatedData['description'],
+                'password' =>  Hash::make($validatedData['password']),
+                'role_id' => $userRole->id,
+            ]);
+
+            event(new Registered($user));
+
+            return redirect('dashboard')->with('status', 'User has been created!');
+        }
+        abort('403');
     }
 
     /**
@@ -45,9 +101,8 @@ class UserController extends Controller
     public function edit(User $user): InertiaResponse
     {
         $response = Gate::inspect('edit', $user);
-        $roleAdmin = Role::where('name', 'admin')->first();
 
-        $authAdmin = auth()->user()->role_id === $roleAdmin->id;
+        $authAdmin = auth()->user()->role->name === 'admin';
         if ($response->allowed()) {
             return Inertia::render('Profile/Edit', [
                 'user' => $user,
