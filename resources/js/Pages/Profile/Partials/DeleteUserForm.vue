@@ -1,42 +1,3 @@
-<script setup>
-import DangerButton from '@/Components/DangerButton.vue';
-import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
-import Modal from '@/Components/Modal.vue';
-import SecondaryButton from '@/Components/SecondaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
-import { useForm } from '@inertiajs/vue3';
-import { nextTick, ref } from 'vue';
-
-const confirmingUserDeletion = ref(false);
-const passwordInput = ref(null);
-
-const form = useForm({
-    password: '',
-});
-
-const confirmUserDeletion = () => {
-    confirmingUserDeletion.value = true;
-
-    nextTick(() => passwordInput.value.focus());
-};
-
-const deleteUser = () => {
-    form.delete(route('user.destroy'), {
-        preserveScroll: true,
-        onSuccess: () => closeModal(),
-        onError: () => passwordInput.value.focus(),
-        onFinish: () => form.reset(),
-    });
-};
-
-const closeModal = () => {
-    confirmingUserDeletion.value = false;
-
-    form.reset();
-};
-</script>
-
 <template>
     <section class="space-y-6">
         <header>
@@ -93,3 +54,45 @@ const closeModal = () => {
         </Modal>
     </section>
 </template>
+<script setup>
+import DangerButton from '@/Components/DangerButton.vue';
+import InputError from '@/Components/InputError.vue';
+import InputLabel from '@/Components/InputLabel.vue';
+import Modal from '@/Components/Modal.vue';
+import SecondaryButton from '@/Components/SecondaryButton.vue';
+import TextInput from '@/Components/TextInput.vue';
+import { useForm } from '@inertiajs/vue3';
+import { ref } from 'vue';
+
+const props = defineProps({
+    user: Object,
+});
+
+const confirmingUserDeletion = ref(false);
+const passwordInput = ref(null);
+
+const form = useForm({
+    password: '',
+});
+
+const confirmUserDeletion = () => {
+    confirmingUserDeletion.value = true;
+
+    deleteUser()
+};
+
+const deleteUser = () => {
+    form.delete(route('user.delete', [props.user.id]), {
+        preserveScroll: true,
+        onSuccess: () => closeModal(),
+        onError: () => passwordInput.value.focus(),
+        onFinish: () => form.reset(),
+    });
+};
+
+const closeModal = () => {
+    confirmingUserDeletion.value = false;
+
+    form.reset();
+};
+</script>
