@@ -12,17 +12,16 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
-use Inertia\Response;
+use Inertia\Response as InertiaResponse;
 
 class UserController extends Controller
 {
     /**
      * Display all users
      *
-     * @param Request $request
-     * @return Response
+     * @return InertiaResponse
      */
-    public function index(Request $request): Response
+    public function index(): InertiaResponse
     {
         $response = Gate::inspect('viewAny', auth()->user());
         if ($response->allowed()) {
@@ -38,8 +37,12 @@ class UserController extends Controller
 
     /**
      * Display the user's form.
+     *
+     * @param User $user
+     *
+     * @return InertiaResponse
      */
-    public function edit(User $user): Response
+    public function edit(User $user): InertiaResponse
     {
         $response = Gate::inspect('edit', $user);
         $roleAdmin = Role::where('name', 'admin')->first();
@@ -58,6 +61,10 @@ class UserController extends Controller
 
     /**
      * Update the user's information.
+     *
+     * @param UserRequest $request
+     *
+     * @return RedirectResponse
      */
     public function update(UserRequest $request): RedirectResponse
     {
@@ -69,13 +76,18 @@ class UserController extends Controller
 
         $request->user()->save();
 
-        return redirect()->route('user.edit', ['id' => $request->user()->id]);;
+        return redirect()->route('user.edit', ['id' => $request->user()->id]);
     }
 
     /**
      * Delete the user's account.
+     *
+     * @param Request $request
+     * @param User $user
+     *
+     * @return RedirectResponse
      */
-    public function destroy(Request $request, User $user): RedirectResponse
+    public function delete(Request $request, User $user): RedirectResponse
     {
         $response = Gate::inspect('destroy', $user);
 
@@ -101,6 +113,26 @@ class UserController extends Controller
             $request->session()->regenerateToken();
 
             return Redirect::to('/');
+        }
+        abort('403');
+    }
+
+    /**
+     * Delete the user's account.
+     *
+     * @param User $user
+     *
+     * @return RedirectResponse
+     */
+    public function destroy(User $user): RedirectResponse
+    {
+        $response = Gate::inspect('destroy', $user);
+
+        // If user is admin or owner of profile
+        if ($response->allowed()) {
+            $user->forceDelete();
+
+            return Redirect::to('/dashboard');
         }
         abort('403');
     }
