@@ -4,8 +4,8 @@
             <h2 class="text-lg font-medium text-gray-900">Delete Account</h2>
 
             <p class="mt-1 text-sm text-gray-600">
-                Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting
-                your account, please download any data or information that you wish to retain.
+                Your account will be deleted but your data will be kept for a certain time.
+                Please, contact an admin if you want to delete permanently your data.
             </p>
         </header>
 
@@ -18,8 +18,8 @@
                 </h2>
 
                 <p class="mt-1 text-sm text-gray-600">
-                    Once your account is deleted, all of its resources and data will be permanently deleted. Please
-                    enter your password to confirm you would like to permanently delete your account.
+                    Your account will be deleted but your data will be kept for a certain time.
+                    Please, contact an admin if you want to delete permanently your data.
                 </p>
 
                 <div class="mt-6">
