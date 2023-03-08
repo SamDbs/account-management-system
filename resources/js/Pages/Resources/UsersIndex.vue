@@ -10,43 +10,41 @@
         </NavLink>
         <DangerButton
             class=""
-            @click="confirmUserDeletion"
+            @click="confirmUserDeletion('delete')"
         >
             Delete Account
         </DangerButton>
-        <PrimaryButton>
-            Destroy
-        </PrimaryButton>
+        <DangerButton
+            class=""
+            @click="confirmUserDeletion('destroy')"
+        >
+            Destroy Account
+        </DangerButton>
     </div>
     <Modal :show="confirmingUserDeletion" @close="closeModal">
         <div class="p-6">
             <h2 class="text-lg font-medium text-gray-900">
-                Are you sure you want to delete this account?
+                {{ warningTitle }}
             </h2>
 
             <p class="mt-1 text-sm text-gray-600">
-                Once your account is deleted, all of its resources and data will be permanently deleted. Please
-                enter your password to confirm you would like to permanently delete your account.
+                {{ warningText }}
             </p>
 
             <div class="mt-6 flex justify-end">
                 <SecondaryButton @click="closeModal"> Cancel </SecondaryButton>
 
-                <DangerButton
-                    class="ml-3"
-                    @click="deleteUser"
-                >
+                <NavLink :href="actionValue" method="delete" as="button" class="ml-3 inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-500 active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
                     Delete Account
-                </DangerButton>
+                </NavLink>
             </div>
         </div>
     </Modal>
 </template>
 <script setup>
-import PrimaryButton from "@/Components/PrimaryButton.vue";
+import { ref } from "vue";
 import NavLink from '@/Components/NavLink.vue';
 import DangerButton from '@/Components/DangerButton.vue';
-import {nextTick, ref} from "vue";
 import Modal from '@/Components/Modal.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 
@@ -62,8 +60,15 @@ const props = defineProps({
 });
 
 const confirmingUserDeletion = ref(false);
+const actionValue = ref()
+const warningText = ref()
+const warningTitle = ref()
 
 const deleteUser = () => {
+    confirmingUserDeletion.value = false;
+};
+
+const destroyUser = () => {
     confirmingUserDeletion.value = false;
     route('user.destroy', [props.user.id])
 };
@@ -72,7 +77,24 @@ const closeModal = () => {
     confirmingUserDeletion.value = false;
 };
 
-const confirmUserDeletion = () => {
+const confirmUserDeletion = (action) => {
+    handleAction(action)
     confirmingUserDeletion.value = true;
 };
+
+function handleAction(action) {
+    switch (action) {
+        case 'delete':
+            warningTitle.value = "Are you sure you want to soft delete this account?"
+            warningText.value = "This is a soft delete. Account's resources are not deleted"
+            actionValue.value = route('user.delete', [props.user.id])
+            confirmingUserDeletion.value = false
+            break
+        case 'destroy':
+            warningTitle.value = "Are you sure you want to destroy this account?"
+            warningText.value = "Once this account is destroyed, all of its resources and data will be permanently deleted"
+            actionValue.value = route('user.destroy', [props.user.id])
+            confirmingUserDeletion.value = false;
+    }
+}
 </script>
