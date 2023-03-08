@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
 
@@ -62,8 +61,8 @@ class UserController extends Controller
      * Store new user
      *
      * @param UserRequest $userRequest
+     * @param User $user
      *
-     * @throws ValidationException
      * @return RedirectResponse
      */
     public function store(UserRequest $userRequest, User $user): RedirectResponse
@@ -118,6 +117,7 @@ class UserController extends Controller
      * Update the user's information.
      *
      * @param UserRequest $request
+     * @param User $user
      *
      * @return RedirectResponse
      */
